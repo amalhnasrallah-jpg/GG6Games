@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Computer Helpers Quest</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800&family=Lalezar&display=swap" rel="stylesheet">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--sky:#bfeaf5;--ink:#16324a;--soft:#4a6a7f;--card:#fffbef;--edge:#f0d98a;--drop:#d9b957;--opt:#fff;--optedge:#b9e0e8;--chip:rgba(255,255,255,.92);--track:#d8ecef;
+--in:#5fbf4a;--out:#f28a3c;--st:#3b9be0;--sun:#ffc53d}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--sky:#0e3a4d;--ink:#f2fbff;--soft:#a9c9d6;--card:#12303f;--edge:#2a6b82;--drop:#0a2230;--opt:#184559;--optedge:#2b6f88;--chip:rgba(16,48,64,.92);--track:#0a2230}}
+:root[data-theme="dark"]{--sky:#0e3a4d;--ink:#f2fbff;--soft:#a9c9d6;--card:#12303f;--edge:#2a6b82;--drop:#0a2230;--opt:#184559;--optedge:#2b6f88;--chip:rgba(16,48,64,.92);--track:#0a2230}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}[hidden]{display:none!important}
+body{margin:0;height:100%;overflow:hidden;background:linear-gradient(var(--sky),#e8f8fb 70%);font-family:"Cairo","Segoe UI",sans-serif;color:var(--ink);user-select:none;-webkit-tap-highlight-color:transparent}
+.bg i{position:fixed;font-style:normal;font-size:28px;opacity:.35;animation:fl 9s linear infinite}
+@keyframes fl{from{transform:translateY(105vh) rotate(0)}to{transform:translateY(-15vh) rotate(360deg)}}
+.hud{position:fixed;left:12px;right:12px;top:calc(env(safe-area-inset-top,0px) + 10px);display:flex;gap:8px;align-items:center;z-index:3}
+.chip{background:var(--chip);border:2px solid #fff;border-radius:18px;box-shadow:0 4px 0 rgba(20,70,90,.18),0 10px 18px rgba(20,70,90,.15);padding:5px 12px;display:flex;align-items:center;gap:6px;font-weight:800;font-size:14px}
+.chip b{font-family:Lalezar,Cairo;font-weight:400;font-size:26px;line-height:1}
+.prog{flex:1;flex-direction:column;align-items:stretch;gap:4px;min-width:0}
+.track{height:10px;border-radius:9px;background:var(--track);overflow:hidden}
+.track i{display:block;height:100%;width:0;background:linear-gradient(#ffe27a,var(--sun));transition:width .5s cubic-bezier(.3,1.3,.5,1)}
+.round{width:44px;height:44px;border-radius:50%;border:2px solid #fff;background:var(--chip);font-size:19px;cursor:pointer;box-shadow:0 4px 0 rgba(20,70,90,.18)}
+.round:active{transform:translateY(3px)}
+#stage{position:fixed;left:0;right:0;top:calc(env(safe-area-inset-top,0px) + 66px);height:40vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+#mascot{width:min(28vh,160px);animation:bob 2.2s ease-in-out infinite}
+#mascot.jump{animation:jump .7s}#mascot.shake{animation:shake .5s}
+@keyframes bob{50%{transform:translateY(-10px) rotate(2deg)}}
+@keyframes jump{30%{transform:translateY(-40px) scale(1.1,.95)}60%{transform:translateY(0) scale(.95,1.08)}}
+@keyframes shake{20%,60%{transform:translateX(-12px)}40%,80%{transform:translateX(12px)}}
+.eye{transform-origin:center;transform-box:fill-box;animation:blink 4s infinite}
+@keyframes blink{0%,94%,100%{transform:scaleY(1)}97%{transform:scaleY(.1)}}
+.m-sad,.m-happy{display:none}svg.happy .m-happy,svg.sad .m-sad{display:block}svg:not(.happy):not(.sad) .m-smile{display:block}svg.happy .m-smile,svg.sad .m-smile{display:none}
+.bubble{background:var(--card);border:3px solid var(--edge);border-radius:20px;padding:6px 16px;font-weight:800;font-size:15px;box-shadow:0 4px 0 var(--drop);max-width:88vw;text-align:center}
+.item svg{width:clamp(80px,17vh,120px);height:auto;display:block}.item{animation:wob 1.6s ease-in-out infinite;filter:drop-shadow(0 8px 6px rgba(0,0,0,.2))}
+@keyframes wob{50%{transform:rotate(-8deg) scale(1.08)}}
+.panel{position:fixed;left:0;right:0;margin:0 auto;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);width:min(720px,calc(100% - 24px));max-height:52vh;overflow:auto;background:var(--card);border:4px solid var(--edge);border-radius:28px;box-shadow:0 8px 0 var(--drop),0 22px 34px rgba(15,55,75,.25);padding:16px;text-align:center;animation:up .4s cubic-bezier(.2,1.2,.4,1)}
+@keyframes up{from{transform:translateY(40px);opacity:0}}
+h1,h2{font-family:Lalezar,Cairo;font-weight:400;margin:0 0 6px;line-height:1.1}h1{font-size:clamp(34px,9vw,52px)}h2{font-size:28px}
+p{margin:4px 0 12px;color:var(--soft);font-weight:700}
+.q{font-weight:800;font-size:clamp(17px,4.6vw,22px);margin:0 0 12px}
+.opts{display:grid;gap:10px}.opts.c3{grid-template-columns:repeat(3,1fr)}.opts.c2{grid-template-columns:1fr 1fr}
+@media(max-width:420px){.opts.c2{grid-template-columns:1fr}}
+button.o{font:800 clamp(14px,4vw,18px) Cairo,sans-serif;color:var(--ink);background:var(--opt);border:3px solid var(--optedge);border-radius:18px;padding:12px 8px;cursor:pointer;box-shadow:0 5px 0 var(--optedge);transition:transform .1s}
+button.o:active{transform:translateY(4px);box-shadow:0 1px 0 var(--optedge)}
+button.o.ok{background:#5fe08e;border-color:#1c8a4a;box-shadow:0 5px 0 #1c8a4a;color:#0b3d20}
+button.o.bad{background:#ff8a8a;border-color:#b23a3a;box-shadow:0 5px 0 #b23a3a;color:#4a1010}
+button.o:disabled{cursor:default}
+.c3 .o.i{border-color:var(--in);box-shadow:0 5px 0 var(--in)}.c3 .o.u{border-color:var(--out);box-shadow:0 5px 0 var(--out)}.c3 .o.s{border-color:var(--st);box-shadow:0 5px 0 var(--st)}
+.go{font:400 28px Lalezar,Cairo;color:#fff;background:linear-gradient(#ffb84a,#f28a1c);border:0;border-radius:22px;padding:8px 40px;cursor:pointer;box-shadow:0 6px 0 #b8600d;-webkit-text-stroke:0}
+.go:active{transform:translateY(5px);box-shadow:0 1px 0 #b8600d}
+.stars{font-size:44px;letter-spacing:4px}.stars span{display:inline-block;animation:pop .6s both}
+@keyframes pop{from{transform:scale(0) rotate(-90deg)}}
+.toast{position:fixed;left:0;right:0;top:26%;text-align:center;pointer-events:none;opacity:0;font:400 clamp(48px,14vw,86px) Lalezar,Cairo;color:#fff;-webkit-text-stroke:8px #1c8a4a;paint-order:stroke fill;z-index:5}
+.toast.bad{-webkit-text-stroke-color:#b23a3a}
+.toast.show{animation:tp 1s cubic-bezier(.2,1.2,.4,1) forwards}
+@keyframes tp{0%{opacity:0;transform:scale(.3) rotate(-6deg)}25%{opacity:1;transform:scale(1.15) rotate(3deg)}40%{transform:scale(1)}80%{opacity:1}100%{opacity:0;transform:translateY(-24px)}}
+.flash{position:fixed;inset:0;pointer-events:none;opacity:0;z-index:4}
+.flash.ok{animation:f 1s ease-out;--c:rgba(47,220,120,.55)}.flash.bad{animation:f .7s ease-out;--c:rgba(238,90,90,.45)}
+@keyframes f{25%{opacity:1;box-shadow:inset 0 0 130px 30px var(--c)}100%{opacity:0}}
+.conf{position:fixed;top:-20px;font-size:26px;pointer-events:none;z-index:6;animation:cf 2.4s linear forwards}
+@keyframes cf{to{transform:translateY(110vh) rotate(720deg)}}
+</style>
+</head>
+<body>
+<div class="bg" id="bg"></div>
+<div class="hud" id="hud" hidden>
+  <div class="chip">⭐ <b id="score">0</b></div>
+  <div class="chip prog"><span id="lvl">Level 1</span><div class="track"><i id="bar"></i></div></div>
+  <div class="chip" id="hearts">❤️❤️❤️</div>
+  <button class="round" id="mute" aria-label="Sound">🔊</button>
+</div>
+<div id="stage"><div id="mascot"></div><div id="item" class="item" hidden></div><div class="bubble" id="say"></div></div>
+<div class="panel" id="panel"></div>
+<div class="toast" id="toast"></div><div class="flash" id="flash"></div>
+
+<script>
+/* ---------- sound ---------- */
+let AC,muted=false;
+function tone(f,d,type='sine',t=0,v=.18){if(muted)return;try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),g=AC.createGain(),s=AC.currentTime+t;o.type=type;o.frequency.setValueAtTime(f,s);g.gain.setValueAtTime(v,s);g.gain.exponentialRampToValueAtTime(.001,s+d);o.connect(g).connect(AC.destination);o.start(s);o.stop(s+d)}catch(e){}}
+const sfx={
+ click:()=>tone(520,.08,'square',0,.08),
+ ok:()=>[523,659,784,1047].forEach((f,i)=>tone(f,.18,'triangle',i*.07)),
+ bad:()=>{tone(220,.25,'sawtooth',0,.14);tone(160,.35,'sawtooth',.12,.14)},
+ win:()=>[523,659,784,659,784,1047,1319].forEach((f,i)=>tone(f,.25,'triangle',i*.11)),
+ lose:()=>[392,349,311,262].forEach((f,i)=>tone(f,.3,'sine',i*.2))
+};
+/* ---------- mascots (animated SVG) ---------- */
+const face=(y=64)=>`<g><g class="eye"><circle cx="46" cy="${y}" r="8" fill="#16324a"/><circle cx="49" cy="${y-3}" r="3" fill="#fff"/></g><g class="eye"><circle cx="74" cy="${y}" r="8" fill="#16324a"/><circle cx="77" cy="${y-3}" r="3" fill="#fff"/></g>
+<ellipse cx="34" cy="${y+12}" rx="7" ry="4" fill="#ff8fa3" opacity=".7"/><ellipse cx="86" cy="${y+12}" rx="7" ry="4" fill="#ff8fa3" opacity=".7"/>
+<path class="m-smile" d="M52 ${y+10}q8 6 16 0" stroke="#16324a" stroke-width="3" fill="none" stroke-linecap="round"/>
+<path class="m-happy" d="M50 ${y+8}q10 14 20 0z" fill="#16324a"/><path class="m-sad" d="M52 ${y+16}q8 -8 16 0" stroke="#16324a" stroke-width="3" fill="none" stroke-linecap="round"/></g>`;
+const MASC={
+ mouse:`<svg viewBox="0 0 120 120"><path d="M92 100q22 4 18 -22" stroke="#7d8aa0" stroke-width="4" fill="none"/><circle cx="34" cy="26" r="13" fill="#c9d3e3"/><circle cx="86" cy="26" r="13" fill="#c9d3e3"/><ellipse cx="60" cy="68" rx="46" ry="44" fill="#e4eaf5" stroke="#7d8aa0" stroke-width="4"/><path d="M60 24v26" stroke="#7d8aa0" stroke-width="4"/>${face()}</svg>`,
+ chip:`<svg viewBox="0 0 120 120"><g fill="#f2b632">${[26,44,62,80].map(x=>`<rect x="${x}" y="6" width="8" height="14"/><rect x="${x}" y="100" width="8" height="14"/>`).join('')}</g><rect x="14" y="16" width="92" height="88" rx="16" fill="#3b4a6b" stroke="#1d2740" stroke-width="4"/><text x="60" y="38" font-size="14" font-weight="800" fill="#9fb4e6" text-anchor="middle" font-family="Cairo">SSD</text>${face(70)}</svg>`,
+ cloud:`<svg viewBox="0 0 120 120"><path d="M30 96a24 24 0 0 1-2-48 30 30 0 0 1 58-6 26 26 0 0 1 6 54z" fill="#fff" stroke="#8ec5e8" stroke-width="4"/>${face(68)}</svg>`,
+ robot:`<svg viewBox="0 0 120 120"><line x1="60" y1="8" x2="60" y2="22" stroke="#7d8aa0" stroke-width="4"/><circle cx="60" cy="8" r="6" fill="#ff6b6b"/><rect x="16" y="22" width="88" height="82" rx="22" fill="#8fd0f0" stroke="#3b7fa8" stroke-width="4"/><rect x="8" y="50" width="8" height="24" rx="4" fill="#3b7fa8"/><rect x="104" y="50" width="8" height="24" rx="4" fill="#3b7fa8"/>${face(58)}</svg>`
+};
+function setM(k,mood){const m=document.getElementById('mascot');if(k)m.innerHTML=MASC[k];const s=m.firstChild;s.classList.remove('happy','sad');if(mood)s.classList.add(mood)}
+function react(ok){const m=document.getElementById('mascot');setM(null,ok?'happy':'sad');m.classList.remove('jump','shake');void m.offsetWidth;m.classList.add(ok?'jump':'shake');setTimeout(()=>{m.classList.remove('jump','shake');m.firstChild.classList.remove('happy','sad')},900)}
+/* ---------- data ---------- */
+const I='Input',O='Output',S='Storage';
+const DEV=[['Keyboard','keyboard',I],['Mouse','mouse',I],['Microphone','mic',I],['Joystick','joystick',I],['Webcam','webcam',I],['Scanner','scanner',I],['Barcode Reader','barcode',I],
+['Monitor / Screen','monitor',O],['Printer','printer',O],['Projector','projector',O],['Speakers','speakers',O],['Headphones','headphones',O],['Wireless Earphones','earbuds',O],
+['HDD (Hard Disk Drive)','hdd',S],['SSD (Solid State Drive)','ssd',S],['USB flash drive','usb',S],['SD card','sd',S],['micro SD','microsd',S],['External hard disk','exthdd',S],['Google Drive','gdrive',S],['iCloud','icloud',S],['OneDrive','onedrive',S],['CD / DVD / BD','cd',S]];
+const cl=c=>`<path d="M28 78a20 20 0 0 1-2-40 24 24 0 0 1 46-4 23 23 0 0 1 4 44z" fill="${c}"/><path d="M40 56q10 8 20 0" fill="none" stroke-width="3"/>`;
+const keys=[0,1,2].map(r=>Array.from({length:8},(_,c)=>`<rect x="${15+c*9.5}" y="${35+r*10}" width="7" height="6" rx="1.5" fill="#fff" stroke-width="1.5"/>`).join('')).join('');
+const ICONS={
+keyboard:`<rect x="6" y="26" width="88" height="50" rx="8" fill="#d5dbe8"/>${keys}<rect x="28" y="65" width="44" height="6" rx="2" fill="#fff" stroke-width="1.5"/>`,
+mouse:`<path d="M50 10c-18 0-26 14-26 32v16c0 18 10 32 26 32s26-14 26-32V42c0-18-8-32-26-32z" fill="#e4eaf5"/><path d="M50 10v34M24 44h52"/><rect x="45" y="20" width="10" height="16" rx="5" fill="#9fb4d6"/>`,
+mic:`<rect x="34" y="6" width="32" height="46" rx="16" fill="#8fd0f0"/><path d="M36 20h28M36 30h28" stroke-width="2.5"/><path d="M24 38c0 20 11 28 26 28s26-8 26-28M50 66v18M34 90h32" fill="none"/>`,
+joystick:`<rect x="12" y="68" width="76" height="22" rx="9" fill="#5b6478"/><circle cx="72" cy="79" r="4" fill="#e0454f" stroke-width="2"/><path d="M42 68V38" stroke-width="9"/><circle cx="42" cy="28" r="17" fill="#e0454f"/><circle cx="36" cy="22" r="4" fill="#fff" stroke="none"/>`,
+webcam:`<circle cx="50" cy="38" r="30" fill="#c9d3e3"/><circle cx="50" cy="38" r="18" fill="#3b7fa8"/><circle cx="50" cy="38" r="7" fill="#16324a"/><circle cx="45" cy="33" r="2.5" fill="#fff" stroke="none"/><path d="M40 70l-8 20h36l-8-20" fill="#9fb4d6"/>`,
+scanner:`<path d="M6 60l14-32h60l14 32z" fill="#9fd7e8"/><rect x="6" y="60" width="88" height="22" rx="6" fill="#d5dbe8"/><path d="M18 71h44" stroke-width="3"/><circle cx="82" cy="71" r="3.5" fill="#5fbf4a" stroke="none"/>`,
+barcode:`<path d="M26 20h44c8 0 12 5 12 12v8H26z" fill="#c9d3e3"/><path d="M56 40h22l-8 46H50z" fill="#9fb4d6"/><rect x="14" y="20" width="12" height="20" rx="3" fill="#3b7fa8"/><path d="M12 30l-8-8M12 30h-9M12 30l-8 8" stroke="#e0454f" stroke-width="3"/><path d="M8 62v22M14 62v22M18 62v22M26 62v22M31 62v22M38 62v22" stroke-width="3"/>`,
+monitor:`<rect x="6" y="10" width="88" height="58" rx="8" fill="#d5dbe8"/><rect x="14" y="18" width="72" height="42" rx="3" fill="#8fd0f0"/><path d="M50 68v16M30 88h40"/>`,
+printer:`<rect x="26" y="6" width="48" height="30" fill="#fff"/><rect x="8" y="34" width="84" height="40" rx="8" fill="#9fb4d6"/><circle cx="80" cy="46" r="3" fill="#5fbf4a" stroke="none"/><rect x="24" y="58" width="52" height="32" fill="#fff"/><path d="M32 68h36M32 78h24" stroke-width="2.5"/>`,
+projector:`<rect x="6" y="28" width="88" height="46" rx="10" fill="#d5dbe8"/><circle cx="66" cy="51" r="18" fill="#8fd0f0"/><circle cx="66" cy="51" r="8" fill="#3b7fa8"/><path d="M18 40v22M27 40v22M36 40v22"/><path d="M20 74v9M80 74v9"/>`,
+speakers:`<rect x="8" y="8" width="38" height="84" rx="8" fill="#5b6478"/><rect x="54" y="8" width="38" height="84" rx="8" fill="#5b6478"/>${[27,73].map(x=>`<circle cx="${x}" cy="66" r="12" fill="#f2b632"/><circle cx="${x}" cy="66" r="4" fill="#16324a" stroke="none"/><circle cx="${x}" cy="28" r="6" fill="#f2b632"/>`).join('')}`,
+headphones:`<path d="M18 62V50a32 32 0 0 1 64 0v12" fill="none" stroke-width="8"/><rect x="8" y="54" width="22" height="34" rx="10" fill="#e0454f"/><rect x="70" y="54" width="22" height="34" rx="10" fill="#e0454f"/>`,
+earbuds:`<circle cx="28" cy="32" r="16" fill="#fff"/><rect x="34" y="40" width="11" height="44" rx="5.5" fill="#fff"/><circle cx="72" cy="32" r="16" fill="#fff"/><rect x="55" y="40" width="11" height="44" rx="5.5" fill="#fff"/><path d="M50 12q6 4 0 10M56 8q10 8 0 18" fill="none" stroke="#3b9be0" stroke-width="3"/>`,
+hdd:`<rect x="8" y="10" width="84" height="80" rx="10" fill="#c9d3e3"/><circle cx="46" cy="50" r="28" fill="#eef2f9"/><circle cx="46" cy="50" r="7" fill="#9fb4d6"/><path d="M80 22L54 48" stroke-width="6"/><circle cx="16" cy="18" r="2" fill="#16324a"/><circle cx="84" cy="82" r="2" fill="#16324a"/>`,
+ssd:`<rect x="8" y="20" width="84" height="58" rx="8" fill="#3b4a6b"/><text x="50" y="58" font-size="26" font-weight="800" text-anchor="middle" fill="#fff" stroke="none" font-family="Cairo,sans-serif">SSD</text><path d="M20 78v10M32 78v10M44 78v10" stroke="#f2b632" stroke-width="5"/>`,
+usb:`<rect x="6" y="32" width="64" height="36" rx="9" fill="#3b9be0"/><rect x="70" y="38" width="26" height="24" fill="#d5dbe8"/><rect x="78" y="46" width="4" height="8" fill="#16324a" stroke="none"/><rect x="86" y="46" width="4" height="8" fill="#16324a" stroke="none"/><circle cx="22" cy="50" r="6" fill="#fff"/>`,
+sd:`<path d="M22 6h42l14 14v74H22z" fill="#2f3e5c"/><path d="M31 12v16M39 12v16M47 12v16M55 12v16" stroke="#f2b632" stroke-width="4"/><rect x="30" y="50" width="40" height="34" rx="4" fill="#f7d774" stroke-width="3"/><text x="50" y="74" font-size="18" font-weight="800" text-anchor="middle" fill="#16324a" stroke="none" font-family="Cairo,sans-serif">SD</text>`,
+microsd:`<path d="M30 16h28l14 14v54H30z" fill="#f2b632"/><path d="M38 62v16M46 62v16M54 62v16" stroke-width="3"/><rect x="38" y="30" width="26" height="22" rx="3" fill="#fff" stroke-width="3"/>`,
+exthdd:`<rect x="10" y="16" width="80" height="62" rx="14" fill="#9aa5b8"/><rect x="20" y="26" width="48" height="8" rx="4" fill="#d5dbe8" stroke-width="2.5"/><circle cx="76" cy="30" r="4" fill="#5fbf4a" stroke="none"/><rect x="40" y="78" width="20" height="10" fill="#d5dbe8"/>`,
+gdrive:`<path d="M34 10h32l28 48H62z" fill="#f9c440" stroke-width="3"/><path d="M34 10L6 58l16 28 28-48z" fill="#1fa463" stroke-width="3"/><path d="M22 86l16-28h56L78 86z" fill="#4285f4" stroke-width="3"/>`,
+icloud:cl('#fff'),onedrive:cl('#3b9be0'),
+cd:`<circle cx="50" cy="50" r="42" fill="#e8f1fb"/><circle cx="50" cy="50" r="14" fill="#bfeaf5"/><circle cx="50" cy="50" r="4" fill="#fff"/><path d="M20 38a34 34 0 0 1 22-20" stroke="#ff8fa3" stroke-width="5" fill="none"/><path d="M80 62a34 34 0 0 1-22 20" stroke="#3b9be0" stroke-width="5" fill="none"/>`};
+const icon=k=>`<svg viewBox="0 0 100 100" stroke="#16324a" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">${ICONS[k]}</svg>`;
+const MC=[ // level 2: storage & definitions
+['What do INPUT devices do?',['Send data into the computer','Show processed data','Store data forever','Cool the computer'],0],
+['What do OUTPUT devices do?',['Send data in','Show processed data to the user','Store data','Charge the battery'],1],
+['What do STORAGE devices do?',['Print pages','Play sounds','Store data permanently','Scan barcodes'],2],
+['Which capacity range matches an SSD?',['128 GB – 8 TB','16 GB – 2 TB','Up to 700 MB','5 GB only'],0],
+['Which capacity range matches an HDD?',['128 GB – 8 TB','500 GB – 20 TB','Up to 700 MB','16 GB – 2 TB'],1],
+['A USB flash drive usually holds…',['Up to 700 MB','500 GB – 20 TB','16 GB – 2 TB','Exactly 5 GB'],2],
+['How much free space does Google Drive give you?',['5 GB','15 GB','2 TB','700 MB'],1],
+['iCloud and OneDrive each offer how much free space?',['5 GB','15 GB','128 GB','20 TB'],0],
+['How much can a normal CD hold?',['Up to 700 MB','Up to 9 GB','Up to 128 GB','Up to 2 TB'],0],
+['Which disc holds up to 128 GB?',['CD','DVD','BD (Blu-ray)','Floppy'],2],
+['How much can a DVD hold?',['Up to 700 MB','Up to 9 GB','Up to 128 GB','Up to 20 TB'],1],
+['SD cards and micro SD cards hold up to about…',['700 MB','15 GB','2 TB','20 TB'],2],
+['What does HDD stand for?',['Hard Disk Drive','High Data Device','Hyper Digital Disk','Home Data Drive'],0],
+['What does SSD stand for?',['Super Speed Disk','Solid State Drive','Simple Storage Device','Smart System Drive'],1],
+['Which has the higher maximum capacity?',['SSD (8 TB)','HDD (20 TB)','Both are 2 TB','CD (700 MB)'],1],
+['Which capacity range fits an external hard disk?',['500 GB – 20 TB','Up to 700 MB','5 GB only','128 GB – 8 TB'],0],
+['Which cloud service offers the MOST free storage?',['iCloud','OneDrive','Google Drive','SD card'],2],
+['Which of these is NOT cloud storage?',['iCloud','OneDrive','Google Drive','SD card'],3],
+['Storage devices keep data…',['Only while the power is on','Permanently','For 1 second','Only as sound'],1],
+['Which is an internal drive?',['SSD','SD card','CD','USB flash drive'],0],
+['Which holds ONLY up to 700 MB?',['CD','Blu-ray','SSD','HDD'],0]];
+const MC3=[ // level 3: boss
+['Which one is an INTERNAL drive?',['SD card','HDD','USB flash drive','External hard disk'],1],
+['Which one is a CLOUD storage service?',['OneDrive','SSD','micro SD','Projector'],0],
+['Which is NOT an input device?',['Webcam','Joystick','Printer','Microphone'],2],
+['Which is NOT an output device?',['Speakers','Barcode Reader','Monitor','Projector'],1],
+['Which is NOT a storage device?',['SD card','SSD','iCloud','Headphones'],3],
+['Which is an EXTERNAL device?',['SSD inside a laptop','Internal HDD','USB flash drive','RAM'],2],
+['Which storage is best for photos you want to reach from any device?',['Cloud storage','CD only','Internal SSD only','Keyboard'],0],
+['Which device reads a barcode at the supermarket?',['Barcode Reader','Projector','Speakers','Printer'],0],
+['Which device sends sound to your ears privately?',['Headphones','Scanner','Webcam','Keyboard'],0],
+['Which device turns a paper page into a digital file?',['Printer','Scanner','Speakers','Monitor'],1],
+['Which device shows a slideshow on a big wall?',['Projector','Microphone','Mouse','HDD'],0],
+['A microphone is what kind of device?',['Output','Storage','Input','Cloud'],2],
+['A printer is what kind of device?',['Input','Output','Storage','Cloud'],1],
+['A USB flash drive is what kind of device?',['Input','Output','Storage','None of them'],2],
+['Which pair are BOTH output devices?',['Speakers & Printer','Mouse & Monitor','Keyboard & Webcam','SSD & Scanner'],0],
+['Which pair are BOTH input devices?',['Monitor & Mouse','Keyboard & Joystick','Printer & Webcam','HDD & Scanner'],1],
+['Which pair are BOTH storage devices?',['HDD & SD card','Mouse & CD','Printer & SSD','Webcam & USB drive'],0],
+['Which one is NOT an external device?',['Internal HDD','USB flash drive','SD card','External hard disk'],0],
+['Which device captures video for video calls?',['Webcam','Speakers','Projector','Printer'],0]];
+const shuf=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+const seen={};
+function pick(pool,n,key){const st=seen[key]||(seen[key]=new Set());let un=pool.filter(x=>!st.has(x[0]));if(un.length<n){st.clear();un=pool.slice()}const r=shuf(un).slice(0,n);r.forEach(x=>st.add(x[0]));return r}
+const LEVELS=[
+ {n:'Sorting Sprint',m:'mouse',intro:"Hi! I'm Mousey! Is each device INPUT, OUTPUT or STORAGE?",build:()=>pick(DEV,8,'a').map(d=>({t:'sort',name:d[0],icon:d[1],a:d[2]}))},
+ {n:'Storage Facts',m:'chip',intro:"I'm Chip the SSD! Let's test your storage facts!",build:()=>pick(MC,7,'b').map(x=>({t:'mc',q:x[0],o:x[1],a:x[2]}))},
+ {n:'Boss Battle',m:'cloud',intro:"Cloudy here! Mix of everything. Careful — hard ones!",build:()=>pick(MC3,7,'c').map(x=>({t:'mc',q:x[0],o:x[1],a:x[2]}))}
+];
+/* ---------- game ---------- */
+const $=id=>document.getElementById(id);
+let L=0,qs=[],qi=0,score=0,lives=3,streak=0,good=0,lock=false;
+const panel=$('panel');
+function say(t){$('say').textContent=t}
+function hud(){ $('score').textContent=score;$('hearts').textContent='❤️'.repeat(lives)+'🖤'.repeat(3-lives);$('lvl').textContent=`Level ${L+1}: ${LEVELS[L].n}`;$('bar').style.width=(qs.length?qi/qs.length*100:0)+'%'}
+function toast(t,ok){const e=$('toast');e.textContent=t;e.className='toast '+(ok?'':'bad');void e.offsetWidth;e.classList.add('show')}
+function flash(ok){const e=$('flash');e.className='flash';void e.offsetWidth;e.className='flash '+(ok?'ok':'bad')}
+function confetti(){for(let i=0;i<26;i++){const c=document.createElement('div');c.className='conf';c.textContent=['⭐','💻','🎉','🖱️','💾','☁️'][i%6];c.style.left=Math.random()*100+'vw';c.style.animationDelay=Math.random()*.8+'s';document.body.appendChild(c);setTimeout(()=>c.remove(),3500)}}
+
+function title(){
+ $('hud').hidden=true;$('item').hidden=true;setM('robot');say('Bleep bloop! Ready to play?');
+ panel.innerHTML=`<h1>Computer Helpers Quest</h1><p>3 levels · Input, Output &amp; Storage devices</p><button class="go" id="st">Play!</button>`;
+ $('st').onclick=()=>{sfx.click();L=0;score=0;startLevel()};
+}
+function startLevel(){
+ const lv=LEVELS[L];qs=lv.build();qi=0;lives=3;streak=0;good=0;$('hud').hidden=false;hud();$('item').hidden=true;setM(lv.m);say(lv.intro);
+ panel.innerHTML=`<h2>Level ${L+1}: ${lv.n}</h2><p>${qs.length} questions · 3 lives ❤️❤️❤️</p><button class="go" id="st">Start</button>`;
+ $('st').onclick=()=>{sfx.click();next()};
+}
+function next(){
+ if(qi>=qs.length)return endLevel(true);
+ lock=false;hud();const q=qs[qi];
+ if(q.t==='sort'){
+  $('item').hidden=false;$('item').innerHTML=icon(q.icon);say(q.name);
+  panel.innerHTML=`<div class="q">Which type of device is this?</div><div class="opts c3"><button class="o i" data-v="Input">⌨️ Input</button><button class="o u" data-v="Output">🖥️ Output</button><button class="o s" data-v="Storage">💾 Storage</button></div>`;
+  panel.querySelectorAll('button').forEach(b=>b.onclick=()=>answer(b,b.dataset.v===q.a,q.a));
+ }else{
+  $('item').hidden=true;say('Think carefully!');
+  panel.innerHTML=`<div class="q">${q.q}</div><div class="opts c2" id="ol"></div>`;
+  shuf(q.o.map((t,i)=>[t,i])).forEach(([t,i])=>{const b=document.createElement('button');b.className='o';b.textContent=t;b.onclick=()=>answer(b,i===q.a,q.o[q.a]);$('ol').appendChild(b)});
+ }
+}
+function answer(btn,ok,correct){
+ if(lock)return;lock=true;
+ panel.querySelectorAll('button').forEach(b=>{b.disabled=true;if(b.dataset.v===correct||b.textContent===correct)b.classList.add('ok')});
+ flash(ok);react(ok);
+ if(ok){btn.classList.add('ok');streak++;good++;score+=10+Math.min(streak-1,5)*2;sfx.ok();toast(streak>2?'Combo x'+streak+'!':['Great!','Awesome!','Yes!'][qi%3],true);say(['Nice one! 🎉','You got it!','Brilliant! 💡'][qi%3])}
+ else{btn.classList.add('bad');streak=0;lives--;sfx.bad();toast('Oops!',false);say('Answer: '+correct)}
+ hud();qi++;
+ setTimeout(()=>{if(lives<=0)endLevel(false);else next()},1300);
+}
+function endLevel(won){
+ $('item').hidden=true;$('bar').style.width='100%';
+ if(!won){sfx.lose();setM(null,'sad');say('Oh no, out of lives!');
+  panel.innerHTML=`<h2>Try again!</h2><p>You got ${good}/${qs.length} right.</p><button class="go" id="st">Retry</button>`;
+  $('st').onclick=()=>{sfx.click();startLevel()};return}
+ sfx.win();confetti();setM(null,'happy');
+ const st=good>=qs.length?3:good>=qs.length-2?2:1;
+ say(L<2?'Level complete! 🎊':'You are a Tech Master! 🏆');
+ const stars=[1,2,3].map(n=>`<span style="animation-delay:${n*.2}s;${n>st?'filter:grayscale(1);opacity:.4':''}">⭐</span>`).join('');
+ const last=L>=2;
+ panel.innerHTML=`<h2>${last?'Quest Complete!':'Level '+(L+1)+' Complete!'}</h2><div class="stars">${stars}</div><p>${good}/${qs.length} correct · Score ${score}</p><button class="go" id="st">${last?'Play again':'Next level'}</button>`;
+ $('st').onclick=()=>{sfx.click();if(last)title();else{L++;startLevel()}};
+}
+$('mute').onclick=()=>{muted=!muted;$('mute').textContent=muted?'🔇':'🔊';if(!muted)sfx.click()};
+const em=['💻','🖱️','⌨️','💾','☁️','🔌','🎧','📷'];
+em.forEach((e,i)=>{const s=document.createElement('i');s.textContent=e;s.style.left=(i*13+3)+'vw';s.style.animationDelay=(-i*1.2)+'s';s.style.animationDuration=(8+i)+'s';$('bg').appendChild(s)});
+title();
+</script>
+</body>
+</html>
